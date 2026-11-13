@@ -7,13 +7,23 @@ export function ResultDialog({
   doc: GameDoc;
   restart: () => void;
 }) {
+  const secured = doc.escort?.beacon.status === "secured";
+  const beaconLost = doc.escort?.beacon.status === "lost";
   return (
     <div className="overlay">
       <div className="result-dialog">
         <div className="eyebrow">
-          MISSION {doc.victory ? "COMPLETE" : "ENDED"}
+          MISSION {secured || doc.victory ? "COMPLETE" : "ENDED"}
         </div>
-        <h2>{doc.victory ? "信号已送达。" : "信号暂时中断。"}</h2>
+        <h2>
+          {secured
+            ? "信标已送达。"
+            : doc.victory
+              ? "信号已保全。"
+              : beaconLost
+                ? "信标失守。"
+                : "信号暂时中断。"}
+        </h2>
         <p>每一次坠落，都是下一次进化的起点。</p>
         <div className="result-grid">
           <div>
@@ -37,6 +47,34 @@ export function ResultDialog({
             </div>
           ))}
         </div>
+        {doc.escort && (
+          <div className="escort-result">
+            <div className="section-caption">
+              <span>护送贡献</span>
+              <span>
+                {doc.escort.beacon.status === "secured"
+                  ? "信标已送达"
+                  : doc.escort.beacon.status === "lost"
+                    ? "信标失守"
+                    : "护送中断"}
+              </span>
+            </div>
+            <div className="result-grid escort-grid">
+              <div>
+                <strong>{Math.floor(doc.escort.progress * 100)}%</strong>
+                <small>护送进度</small>
+              </div>
+              <div>
+                <strong>{Math.round(doc.escort.damage)}</strong>
+                <small>信标承伤</small>
+              </div>
+              <div>
+                <strong>{Math.round(doc.escort.repairs)}</strong>
+                <small>修复贡献</small>
+              </div>
+            </div>
+          </div>
+        )}
         <button className="primary" onClick={restart}>
           重新接入 ↗
         </button>

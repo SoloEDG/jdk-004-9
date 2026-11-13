@@ -20,13 +20,26 @@ export function HistoryPanel({
         ) : (
           records
             .slice()
-            
+
             .map((r) => (
               <div className="history-row" key={r.id}>
-                <span>{r.victory ? "撤离成功" : "信号中断"}</span>
+                <span>
+                  {r.escort?.secured
+                    ? "护送成功"
+                    : r.victory
+                      ? "撤离成功"
+                      : r.escort
+                        ? "护送中断"
+                        : "信号中断"}
+                </span>
                 <span>{formatTime(r.duration)}</span>
                 <span>波次 {r.wave}</span>
                 <span>{r.kills} 击杀</span>
+                {r.escort && (
+                  <span className="mono">
+                    护送 {Math.floor(r.escort.progress * 100)}%
+                  </span>
+                )}
               </div>
             ))
         )}

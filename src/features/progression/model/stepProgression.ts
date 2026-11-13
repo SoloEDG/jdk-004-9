@@ -12,7 +12,8 @@ export function stepProgression(
     doc.pendingLevels > 0 &&
     doc.phase === "playing" &&
     doc.player.hp > 0 &&
-    !doc.victory
+    !doc.victory &&
+    doc.escort?.beacon.status !== "lost"
   )
     rollChoices(doc);
 }

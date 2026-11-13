@@ -1,5 +1,17 @@
 import type { RunRecord } from "../../../shared/types";
 const STORAGE_KEY = "neon-survivor.records.v1";
+function isEscort(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!value || typeof value !== "object") return false;
+  const e = value as NonNullable<RunRecord["escort"]>;
+  return (
+    ["progress", "damage", "repairs"].every(
+      (k) =>
+        typeof e[k as keyof typeof e] === "number" &&
+        Number.isFinite(e[k as keyof typeof e]),
+    ) && typeof e.secured === "boolean"
+  );
+}
 function isRecord(value: unknown): value is RunRecord {
   if (!value || typeof value !== "object") return false;
   const r = value as RunRecord;
@@ -12,7 +24,8 @@ function isRecord(value: unknown): value is RunRecord {
     ) &&
     Array.isArray(r.weapons) &&
     r.weapons.every((w) => typeof w === "string") &&
-    typeof r.victory === "boolean"
+    typeof r.victory === "boolean" &&
+    isEscort(r.escort)
   );
 }
 export function loadRecords(): RunRecord[] {

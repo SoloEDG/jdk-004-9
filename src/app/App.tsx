@@ -14,13 +14,14 @@ import {
 import { useGame } from "./useGame";
 import { Battlefield, Vitals } from "../features/combat";
 import { WavePanel } from "../features/waves";
+import { EscortPanel } from "../features/escort";
 import { ArsenalPanel } from "../features/arsenal";
 import { UpgradeDialog, ExperienceBar } from "../features/progression";
 import { StatsPanel, ResultDialog, HistoryPanel } from "../features/results";
 import { formatTime } from "../shared/math";
 import { useAudio } from "./useAudio";
 export function App() {
-  const { game, input, start, toggle, choose, restart } = useGame();
+  const { game, input, start, toggle, choose, allocate, restart } = useGame();
   const d = game.current;
   const [history, setHistory] = useState(false);
   const [help, setHelp] = useState(false);
@@ -85,13 +86,14 @@ export function App() {
               </div>
             </div>
             <Vitals doc={d} />
+            <EscortPanel doc={d} allocate={allocate} />
             <WavePanel doc={d} />
             <div className="mission-note">
               <Radio size={18} />
               <span>
-                目标：存活 04:00
+                目标：护送信标抵达终点
                 <br />
-                <small>穿越敌潮，等待撤离窗口。</small>
+                <small>靠近才能推进；远离时敌人会继续攻击它。</small>
               </span>
             </div>
           </aside>
@@ -163,9 +165,9 @@ export function App() {
                     <div className="eyebrow">CONNECTION ESTABLISHED</div>
                     <h2>准备好迎接敌潮了吗？</h2>
                     <p>
-                      移动，躲避，进化。
+                      护送信标穿过敌潮。靠近信标才能推进；
                       <br />
-                      武器将自动开火，你只需要活下去。
+                      离开后敌人会继续攻击它。武器自动开火。
                     </p>
                     <button className="primary" onClick={start}>
                       开始行动 <ArrowUpRight size={17} />
@@ -214,9 +216,11 @@ export function App() {
             <StatsPanel doc={d} />
             <div className="tip">
               <span>生存提示 / 01</span>
-              <p>保持移动。拾取绿色能量晶体升级，组合武器与被动能力。</p>
+              <p>
+                保持移动。拾取绿色能量晶体升级，组合武器与被动能力。粉色修复按左侧分配按钮送往机体或信标。
+              </p>
               <div className="drop-legend">
-                <i /> 能量 <i /> 治疗 <i /> 磁铁
+                <i /> 能量 <i /> 修复 <i /> 磁铁
               </div>
             </div>
           </aside>
@@ -246,14 +250,22 @@ export function App() {
               方向键移动，武器自动瞄准最近的敌人。按住鼠标可改为指向射击。
             </p>
             <p>
-              击败敌人会掉落绿色经验晶体。靠近自动拾取；粉色修复机体，蓝色磁铁吸取全场晶体。
+              击败敌人会掉落绿色经验晶体。靠近自动拾取；粉色修复按左侧面板分配，蓝色磁铁吸取全场晶体。
             </p>
             <p>
               升级时选择一种武器或强化。脉冲、轨道刃、新星可以同时装备，被动强化对所有武器生效。
             </p>
             <p>
+              靠近信标才能推进护送进度；离开后信标会停下，敌人仍会继续攻击它。
+              信标有独立完整度，角色受伤不会直接拖垮护送。
+            </p>
+            <p>
+              拾取粉色修复时，可在左侧面板选择分配给角色或信标。护送进度越高，
+              越多敌人会转而攻击信标。
+            </p>
+            <p>
               ESC / P
-              暂停。切换窗口自动暂停。八波共四分钟，完成后自动记录本局统计。
+              暂停。切换窗口自动暂停。升级时信标移动与承伤同时冻结。信标抵达终点即完成护送。
             </p>
             <button className="primary" onClick={() => setHelp(false)}>
               已了解

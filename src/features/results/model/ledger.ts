@@ -1,5 +1,8 @@
-import type { GameDoc, FrameEvents, RunRecord } from "../../../shared/types";
-export function applyEvents(doc: GameDoc, events: FrameEvents): void {
+import type { GameDoc, RunRecord } from "../../../shared/types";
+export function applyEvents(
+  doc: GameDoc,
+  events: import("../../../shared/types").FrameEvents,
+): void {
   doc.stats.kills += events.kills.length;
   doc.stats.damage += events.damage;
   doc.stats.taken += events.taken;
@@ -18,5 +21,13 @@ export function makeRecord(doc: GameDoc): RunRecord {
     damage: Math.round(doc.stats.damage),
     weapons: doc.weapons.map((w) => `${w.id}:${w.level}`),
     victory: doc.victory,
+    escort: doc.escort
+      ? {
+          progress: doc.escort.progress,
+          damage: Math.round(doc.escort.damage),
+          repairs: Math.round(doc.escort.repairs),
+          secured: doc.escort.beacon.status === "secured",
+        }
+      : undefined,
   };
 }

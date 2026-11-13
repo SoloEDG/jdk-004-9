@@ -1,6 +1,7 @@
 import type { GameDoc, Input, FrameEvents } from "../../../shared/types";
 import { WIDTH, HEIGHT } from "../../../shared/types";
 import { clamp, distance, normalize } from "../../../shared/math";
+import { hurtBeacon } from "../../escort/model/escort";
 import { segmentDistance } from "../lib/collision";
 import { hurtPlayer } from "./health";
 export function stepCombat(
@@ -43,6 +44,19 @@ export function stepCombat(
       ) {
         events.taken += hurtPlayer(doc, bullet.damage);
         bullet.life = -1;
+        continue;
+      }
+      const beacon = doc.escort?.beacon;
+      if (
+        beacon &&
+        beacon.status === "active" &&
+        segmentDistance(beacon, previous, bullet) <
+          beacon.radius + bullet.radius
+      ) {
+        // A colliding shot is spent even while the beacon is briefly immune,
+        // which keeps late projectiles from revoking a secured beacon.
+        hurtBeacon(doc, bullet.damage);
+        bullet.life = -1;
       }
       continue;
     }
@@ -73,8 +87,17 @@ export function stepCombat(
     }
   }
   for (const enemy of doc.enemies) {
-    if (enemy.hp > 0 && distance(enemy, player) < enemy.radius + player.radius)
+    if (enemy.hp <= 0) continue;
+    if (distance(enemy, player) < enemy.radius + player.radius)
       events.taken += hurtPlayer(doc, enemy.kind === "elite" ? 25 : 12);
+  }
+  const beacon = doc.escort?.beacon;
+  if (beacon && beacon.status === "active") {
+    for (const enemy of doc.enemies) {
+      if (enemy.hp <= 0) continue;
+      if (distance(enemy, beacon) < enemy.radius + beacon.radius)
+        hurtBeacon(doc, enemy.kind === "elite" ? 24 : 8);
+    }
   }
   doc.enemies = doc.enemies.filter((e) => e.hp > 0);
   doc.bullets = doc.bullets.filter(

@@ -128,6 +128,60 @@ nav .nav-active {
   background: #727c8c;
   box-shadow: none;
 }
+.escort .badge.escort-secured {
+  border-color: #3f7d61;
+  color: #9ff0bd;
+}
+.escort .badge.escort-lost {
+  border-color: #713c48;
+  color: #ff9aa7;
+}
+.escort .bar.health.beacon i {
+  background: #7fdcff;
+}
+.escort .bar.escort-route i {
+  background: #6da8d8;
+}
+.escort-progress-label {
+  margin-top: 15px;
+}
+.repair-allocate {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 13px;
+}
+.repair-allocate button {
+  border: 1px solid #33454f;
+  border-radius: 4px;
+  padding: 8px 4px;
+  font-size: 10px;
+  color: #8fa6b1;
+  background: #121c24;
+}
+.repair-allocate button:hover {
+  border-color: #5e8ca0;
+  color: #c2e8f6;
+}
+.repair-allocate button.active {
+  background: #1d353f;
+  border-color: #7fd6ea;
+  color: #d4f7ff;
+}
+.escort-metrics {
+  margin-top: 13px;
+  font-size: 9px;
+}
+.escort-result {
+  margin: 0 auto 22px;
+  max-width: 420px;
+}
+.escort-grid {
+  margin: 12px 0 0;
+}
+.escort-grid strong {
+  font-size: 21px;
+}
 main {
   padding: 36px 48px 0;
 }

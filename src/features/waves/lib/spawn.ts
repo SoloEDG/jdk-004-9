@@ -1,6 +1,7 @@
 import type { GameDoc, Enemy } from "../../../shared/types";
 import { WIDTH, HEIGHT } from "../../../shared/types";
 import { random } from "../../../shared/math";
+import { resolveTarget } from "../../escort/lib/targeting";
 import { ENEMY_CATALOG } from "../model/catalog";
 export function spawnEnemy(doc: GameDoc): Enemy {
   const roll = random(doc);
@@ -16,6 +17,7 @@ export function spawnEnemy(doc: GameDoc): Enemy {
   const x = side === 0 ? -28 : side === 1 ? WIDTH + 28 : along * WIDTH;
   const y = side === 2 ? -28 : side === 3 ? HEIGHT + 28 : along * HEIGHT;
   const hp = Math.round(data.hp * (1 + (doc.wave - 1) * 0.22));
+  const bias = random(doc);
   return {
     id: doc.nextId++,
     kind,
@@ -25,5 +27,8 @@ export function spawnEnemy(doc: GameDoc): Enemy {
     maxHp: hp,
     radius: data.radius,
     cooldown: 1 + random(doc),
+    bias,
+    // Assign at spawn so reinforcements immediately threaten both bodies.
+    target: resolveTarget(doc, bias),
   };
 }

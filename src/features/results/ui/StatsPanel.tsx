@@ -26,6 +26,15 @@ export function StatsPanel({ doc }: { doc: GameDoc }) {
         <span>已受伤害</span>
         <strong className="mono">{Math.round(doc.stats.taken)}</strong>
       </div>
+      {doc.escort && (
+        <div className="stat-row">
+          <span>信标完整度</span>
+          <strong className="mono">
+            {Math.ceil(doc.escort.beacon.hp)}
+            <small> / {doc.escort.beacon.maxHp}</small>
+          </strong>
+        </div>
+      )}
     </section>
   );
 }

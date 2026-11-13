@@ -1,7 +1,9 @@
 import type { GameDoc } from "../../../shared/types";
 import { distance, normalize } from "../../../shared/math";
+import { resolveTarget } from "../../escort/lib/targeting";
 import { spawnEnemy } from "../lib/spawn";
 import { ENEMY_CATALOG, WAVE_DURATION, TOTAL_WAVES } from "./catalog";
+
 export function stepWaves(doc: GameDoc, dt: number): void {
   if (doc.victory) return;
   if (doc.wave === 0) {
@@ -25,9 +27,17 @@ export function stepWaves(doc: GameDoc, dt: number): void {
     doc.spawnBudget--;
     if (doc.enemies.length < 180) doc.enemies.push(spawnEnemy(doc));
   }
+  const beacon = doc.escort?.beacon;
+  const beaconActive = beacon?.status === "active";
   for (const enemy of doc.enemies) {
-    const toward = normalize(doc.player.x - enemy.x, doc.player.y - enemy.y),
-      range = distance(enemy, doc.player);
+    // Wave composition plus escort progress decides who each hostile pursues;
+    // once the beacon is gone, every hostile turns back to the operator.
+    // Untagged hostiles (e.g. scripted spawns) default to the operator.
+    enemy.target = resolveTarget(doc, enemy.bias ?? 1);
+    const target =
+      beaconActive && enemy.target === "beacon" ? beacon! : doc.player;
+    const toward = normalize(target.x - enemy.x, target.y - enemy.y),
+      range = distance(enemy, target);
     const standOff =
       enemy.kind === "shooter" ? (range < 170 ? -1 : range < 245 ? 0 : 1) : 1;
     const speed = ENEMY_CATALOG[enemy.kind].speed * (1 + doc.wave * 0.035);

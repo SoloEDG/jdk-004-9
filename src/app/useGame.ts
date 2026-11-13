@@ -92,6 +92,9 @@ export function useGame() {
       else if (d.phase === "paused") d.phase = "playing";
     },
     choose: (id: string) => chooseUpgrade(game.current, id),
+    allocate: (target: "player" | "beacon") => {
+      game.current.repairTarget = target;
+    },
     restart: () => {
       saveRecords(game.current.records);
       game.current = createRun(204004, game.current.records);

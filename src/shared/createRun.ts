@@ -1,6 +1,7 @@
 import type { GameDoc, RunRecord } from "./types";
+import { createEscort } from "../features/escort/model/escort";
 export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
-  return {
+  const doc: GameDoc = {
     version: 1,
     seed,
     initialSeed: seed,
@@ -28,6 +29,8 @@ export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
     wave: 0,
     waveTime: 0,
     spawnBudget: 0,
+    escort: null,
+    repairTarget: "player",
     stats: {
       kills: 0,
       damage: 0,
@@ -40,4 +43,7 @@ export function createRun(seed = 204004, records: RunRecord[] = []): GameDoc {
     notice: "等待接入战场",
     victory: false,
   };
+  // A fresh run always deploys a fresh beacon; discarded runs cannot leak beacons.
+  doc.escort = createEscort(doc.nextId++);
+  return doc;
 }

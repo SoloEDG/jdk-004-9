@@ -1,5 +1,6 @@
 import type { GameDoc, FrameEvents } from "../../../shared/types";
 import { random, distance, normalize } from "../../../shared/math";
+import { applyRepair } from "../../escort/lib/repair";
 import { grantExperience } from "./experience";
 export function generateDrops(doc: GameDoc, events: FrameEvents): void {
   for (const { enemy } of events.kills) {
@@ -53,8 +54,9 @@ export function collectDrops(
     drop.life = -1;
     events.collected++;
     if (drop.kind === "xp") grantExperience(doc, drop.value);
-    if (drop.kind === "heal")
-      doc.player.hp = Math.min(doc.player.maxHp, doc.player.hp + drop.value);
+    // Repair kits are split between the operator and beacon by the current
+    // allocation; unused overflow goes to the other body.
+    if (drop.kind === "heal") applyRepair(doc, drop.value);
     if (drop.kind === "magnet") magnet = true;
   }
   if (magnet) {

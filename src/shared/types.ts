@@ -1,6 +1,8 @@
 export type Vec = { x: number; y: number };
 export type Phase = "ready" | "playing" | "paused" | "upgrade" | "ended";
 export type WeaponId = "pulse" | "orbit" | "nova";
+export type RepairTarget = "player" | "beacon";
+export type EscortStatus = "active" | "secured" | "lost";
 export interface Player extends Vec {
   hp: number;
   maxHp: number;
@@ -15,6 +17,10 @@ export interface Enemy extends Vec {
   maxHp: number;
   radius: number;
   cooldown: number;
+  /** Escort progress decides how much of the wave is diverted to the beacon. */
+  target?: "player" | "beacon";
+  /** Stable roll that lets enemy assignments scale with escort pressure. */
+  bias?: number;
 }
 export interface Bullet extends Vec {
   id: number;
@@ -33,6 +39,21 @@ export interface Drop extends Vec {
   kind: "xp" | "heal" | "magnet";
   value: number;
   life: number;
+}
+export interface Beacon extends Vec {
+  id: number;
+  hp: number;
+  maxHp: number;
+  radius: number;
+  invincible: number;
+  status: EscortStatus;
+}
+export interface EscortState {
+  beacon: Beacon;
+  /** Distance travelled along the escort route, from 0 to 1. */
+  progress: number;
+  damage: number;
+  repairs: number;
 }
 export interface Weapon {
   id: WeaponId;
@@ -63,6 +84,12 @@ export interface RunRecord {
   damage: number;
   weapons: string[];
   victory: boolean;
+  escort?: {
+    progress: number;
+    damage: number;
+    repairs: number;
+    secured: boolean;
+  };
 }
 export interface GameDoc {
   version: 1;
@@ -84,6 +111,9 @@ export interface GameDoc {
   wave: number;
   waveTime: number;
   spawnBudget: number;
+  escort: EscortState | null;
+  /** Where repair pickups are routed while the beacon is active. */
+  repairTarget: RepairTarget;
   stats: RunStats;
   records: RunRecord[];
   notice: string;
